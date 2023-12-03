@@ -16,5 +16,10 @@
         android:name="com.example.photos.ui.search.SearchFragment"
         android:label="@string/menu_gallery"
         tools:layout="@layout/fragment_search" />
+    <fragment
+        android:id="@+id/nav_album"
+        android:name="com.example.photos.ui.checkalbums.AlbumFragment"
+        android:label="Albums"
+        tools:layout="@layout/fragment_album" />
 
 </navigation>

@@ -18,11 +18,4 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/mobile_navigation" />
 
-    <ListView
-        android:id="@+id/albumList"
-        android:layout_width="225dp"
-        android:layout_height="586dp"
-        tools:layout_editor_absoluteX="-7dp"
-        tools:layout_editor_absoluteY="0dp" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
