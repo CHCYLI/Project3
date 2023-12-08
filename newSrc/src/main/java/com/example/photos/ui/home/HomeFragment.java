@@ -49,36 +49,7 @@ public class HomeFragment extends Fragment{
     //String[] temp = {"example", "testing"};
     EditText newAlbumName;
 
-    /*@Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        //view.findViewById(R.id.listView).setOnClickListener(this);
-        String[] temp = {"example", "testing"};
-        listView = (ListView) view.findViewById(R.id.listView);
-        ArrayAdapter<String> arrayAdapter= new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, temp);
-        listView.setAdapter(arrayAdapter);
-        listView.setOnItemClickListener(this);
 
-    }*/
-
-    /*@Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        listView = (ListView)getView().findViewById(R.id.listView);
-        button = (Button)getView().findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick (View view) {
-                addItem(view);
-            }
-        });
-
-        items = new ArrayList<>();
-        itemsAdapter = new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_1, items);
-        listView.setAdapter(itemsAdapter);
-        setUpListViewListener();
-    }*/
 
     private void setUpListViewListener() {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -144,8 +115,11 @@ public class HomeFragment extends Fragment{
         ArrayList<String> tempitems = new ArrayList<>();
         ArrayList<Character> charArrayList = new ArrayList<Character>();
 
-        if (text.equals("") || newName.equals("")) {
-            Toast.makeText(getActivity(), "Name entry cannot be empty", Toast.LENGTH_LONG).show();
+        if (text.equals("") || newName.equals("") || (items.contains(newName) && items.contains(text))
+                || (items.contains(newName) && !items.contains(text))
+                || (!items.contains(text) && items.contains(newName))
+                || (!items.contains(text) && !items.contains(newName))) {
+            Toast.makeText(getActivity(), "Name entry cannot be empty or Wrong Name Entry!", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -166,7 +140,7 @@ public class HomeFragment extends Fragment{
                     }
                     if (text.equals(builder.toString())) {
                         charArrayList.clear();
-                        Toast.makeText(view.getContext(), "Found it!", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(view.getContext(), "Found it!", Toast.LENGTH_LONG).show();
                         continue;
                     }
                     tempitems.add(builder.toString());
@@ -186,12 +160,14 @@ public class HomeFragment extends Fragment{
                 for(Character c: charArrayList) {
                     builder.append(c);
                 }
-                char[] temp = builder.toString().toCharArray();
-                fos.write(',');
-                for (int i = 0; i < temp.length; i++) {
-                    fos.write(temp[i]);
+                if (!text.equals(builder.toString())) {
+                    char[] temp = builder.toString().toCharArray();
+                    fos.write(',');
+                    for (int i = 0; i < temp.length; i++) {
+                        fos.write(temp[i]);
+                    }
+                    tempitems.add(builder.toString());
                 }
-                tempitems.add(builder.toString());
                 charArrayList.clear();
             }
 
@@ -219,7 +195,7 @@ public class HomeFragment extends Fragment{
             mEditText.getText().clear();
             newAlbumName.getText().clear();
 
-            items = load(view);
+            items = tempitems;
             itemsAdapter =  new ArrayAdapter<String>(view.getContext(), android.R.layout.simple_list_item_1, items);
             listView.setAdapter(itemsAdapter);
 
@@ -245,7 +221,10 @@ public class HomeFragment extends Fragment{
         String itemText = inputName.getText().toString();
 
         if (!(itemText.equals(""))) {
-            //mEditText = view.findViewById(R.id.editTextText);
+            if (items.contains(itemText)) {
+                Toast.makeText(view.getContext(), "Repeated Name Not Allowed!", Toast.LENGTH_LONG).show();
+                return;
+            }
             itemsAdapter.add(itemText);
             save(view);
             inputName.setText("");
@@ -293,6 +272,7 @@ public class HomeFragment extends Fragment{
 
     public void save(View view) {
         String text = mEditText.getText().toString();
+
         FileOutputStream fos = null;
         FileInputStream fis = null;
         try {
@@ -322,6 +302,8 @@ public class HomeFragment extends Fragment{
 
             tempAlbumFile.close();
             newFile.close();
+
+            items = load(view);
 
 
             mEditText.getText().clear();
