@@ -9,8 +9,25 @@
         android:id="@+id/nav_home"
         android:name="com.example.photos.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
-
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_nav_photos"
+            app:destination="@id/nav_photos" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_photos"
+        android:name="com.example.photos.ui.photos.PhotosFragment"
+        android:label="@string/menu_photos"
+        tools:layout="@layout/fragment_photos" >
+        <action
+            android:id="@+id/action_nav_photos_to_nav_slideshow"
+            app:destination="@id/nav_slideshow" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_slideshow"
+        android:name="com.example.photos.ui.slideshow.SlideshowFragment"
+        android:label="@string/menu_slideshow"
+        tools:layout="@layout/fragment_slideshow" />
     <fragment
         android:id="@+id/nav_search"
         android:name="com.example.photos.ui.search.SearchFragment"
@@ -23,6 +40,8 @@
     <fragment
         android:id="@+id/nav_results"
         android:name="com.example.photos.ui.results.ResultsFragment"
-        android:label="@string/menu_results" />
+        android:label="@string/menu_results"
+        tools:layout="@layout/fragment_results" />
+
 
 </navigation>

@@ -20,7 +20,9 @@ import android.widget.Toast;
 import com.example.photos.R;
 
 import com.example.photos.databinding.FragmentHomeBinding;
+import androidx.navigation.fragment.NavHostFragment;
 import com.example.photos.ui.home.HomeViewModel;
+import com.example.photos.ui.search.SearchFragment;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,6 +41,7 @@ public class HomeFragment extends Fragment{
     private ListView listView;
     private Button button;
     private Button button_rename;
+    private Button temp_toPhotosButton;
 
     private FragmentHomeBinding binding;
 
@@ -46,7 +49,6 @@ public class HomeFragment extends Fragment{
     private static final String TEMP_NAME = "tempalbums.txt";
     String albumName;
     EditText mEditText;
-    //String[] temp = {"example", "testing"};
     EditText newAlbumName;
 
 
@@ -244,6 +246,8 @@ public class HomeFragment extends Fragment{
         mEditText = view.findViewById(R.id.editTextText);
         newAlbumName = view.findViewById(R.id.editTextText2);
 
+        temp_toPhotosButton = view.findViewById(R.id.toPhotosButton);
+
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -258,6 +262,13 @@ public class HomeFragment extends Fragment{
             public void onClick (View viewone) {
 
                 setButton_rename(view);
+            }
+        });
+
+        temp_toPhotosButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick (View viewone) {
+                NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.action_nav_home_to_nav_photos);
             }
         });
 

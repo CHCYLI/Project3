@@ -13,10 +13,6 @@ public class Photo implements Serializable{
 	private Picture containedPictureFile;
 	private String location = "";
 	private ArrayList<String> people = new ArrayList<String>();
-	/* TODO: implement alternate way to document tags
-	 * -A photo can have an unique tag (e.g. location={"New Brunswick"}) or have multiple tags (e.g. people={"Sesh", "Chang"}
-	 */
-	
 	
 	public Photo(String nameOfPhoto, Picture containedPictureFile) {
         this.nameOfPhoto = nameOfPhoto;

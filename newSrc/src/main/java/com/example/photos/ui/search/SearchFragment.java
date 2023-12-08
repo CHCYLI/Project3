@@ -7,15 +7,16 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.photos.R;
 import com.example.photos.databinding.FragmentSearchBinding;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.photos.ui.results.ResultsFragment;
 
 public class SearchFragment extends Fragment {
 
@@ -58,17 +59,7 @@ public class SearchFragment extends Fragment {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        //.setAction("Action", null).show();
-
-                //TODO: get content of tag1, tag2, tag1type, tag2type, conjunction
-                String tag1;
-                //if tag1 empty: error!
-                //else (tag1 !empty):
-                //if tag2 empty: ignore tag2 & conjunction, search for tag1
-                //else: (tag2 !empty)
-                //if and: search for tag1 && tag2
-                //else (or): search for tag1 || tag2
+                performSearch();
             }
         });
 
@@ -81,5 +72,19 @@ public class SearchFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    public void performSearch() {
+        //TODO: get content of tag1, tag2, tag1type, tag2type, conjunction
+        String tag1;
+        //if tag1 empty: error!
+        //else (tag1 !empty):
+        //if tag2 empty: ignore tag2 & conjunction, search for tag1
+        //else: (tag2 !empty)
+        //if and: search for tag1 && tag2
+        //else (or): search for tag1 || tag2
+
+        // Replace the SearchFragment with the ResultsFragment
+        NavHostFragment.findNavController(SearchFragment.this).navigate(R.id.action_nav_search_to_nav_results);
     }
 }
