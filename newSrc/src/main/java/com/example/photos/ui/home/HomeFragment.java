@@ -47,6 +47,7 @@ public class HomeFragment extends Fragment{
     String albumName;
     EditText mEditText;
     //String[] temp = {"example", "testing"};
+    EditText newAlbumName;
 
     /*@Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -92,9 +93,9 @@ public class HomeFragment extends Fragment{
                 FileOutputStream fos = null;
                 FileInputStream fis = null;
                 try {
-                    Toast.makeText(context, "Hello", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(context, "Hello", Toast.LENGTH_LONG).show();
                     fis = getContext().openFileInput(FILE_NAME);
-                    Toast.makeText(context, "World", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(context, "World", Toast.LENGTH_LONG).show();
                     fos = getContext().openFileOutput(TEMP_NAME, Context.MODE_PRIVATE);
 
                     int ch;
@@ -136,6 +137,106 @@ public class HomeFragment extends Fragment{
     }
 
     private void setButton_rename(View view){
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+        String text = mEditText.getText().toString();
+        String newName = newAlbumName.getText().toString();
+        ArrayList<String> tempitems = new ArrayList<>();
+        ArrayList<Character> charArrayList = new ArrayList<Character>();
+
+        if (text.equals("") || newName.equals("")) {
+            Toast.makeText(getActivity(), "Name entry cannot be empty", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        try {
+            fis = getContext().openFileInput(FILE_NAME);
+            fos = getContext().openFileOutput(TEMP_NAME, Context.MODE_PRIVATE);
+            boolean firstcomma = false;
+
+            int ch;
+            while ((ch = fis.read()) != -1) {
+                if (ch == ',' && !firstcomma) {
+                    firstcomma = true;
+                    //fos.write(ch);
+                } else if (ch == ',') {
+                    StringBuilder builder = new StringBuilder(charArrayList.size());
+                    for(Character c: charArrayList) {
+                        builder.append(c);
+                    }
+                    if (text.equals(builder.toString())) {
+                        charArrayList.clear();
+                        Toast.makeText(view.getContext(), "Found it!", Toast.LENGTH_LONG).show();
+                        continue;
+                    }
+                    tempitems.add(builder.toString());
+                    char[] temp = builder.toString().toCharArray();
+                    fos.write(',');
+                    for (int i = 0; i < temp.length; i++) {
+                        fos.write(temp[i]);
+                    }
+                    charArrayList.clear();
+                } else {
+                    charArrayList.add((char)ch);
+                }
+            }
+
+            if (!charArrayList.isEmpty()) {
+                StringBuilder builder = new StringBuilder(charArrayList.size());
+                for(Character c: charArrayList) {
+                    builder.append(c);
+                }
+                char[] temp = builder.toString().toCharArray();
+                fos.write(',');
+                for (int i = 0; i < temp.length; i++) {
+                    fos.write(temp[i]);
+                }
+                tempitems.add(builder.toString());
+                charArrayList.clear();
+            }
+
+            char[] tempArray = newName.toCharArray();
+            tempitems.add(newName);
+            fos.write(',');
+            for (int i = 0; i < tempArray.length; i++) {
+                fos.write(tempArray[i]);
+            }
+
+
+            fis.close();
+            fos.close();
+
+            FileInputStream tempAlbumFile = getContext().openFileInput(TEMP_NAME);
+            FileOutputStream newFile = getContext().openFileOutput(FILE_NAME, Context.MODE_PRIVATE);
+
+            while ((ch = tempAlbumFile.read()) != -1) {
+                newFile.write(ch);
+            }
+
+            tempAlbumFile.close();
+            newFile.close();
+
+            mEditText.getText().clear();
+            newAlbumName.getText().clear();
+
+            items = load(view);
+            itemsAdapter =  new ArrayAdapter<String>(view.getContext(), android.R.layout.simple_list_item_1, items);
+            listView.setAdapter(itemsAdapter);
+
+            Toast.makeText(view.getContext(), "Rename successfully!", Toast.LENGTH_LONG).show();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
     }
 
@@ -162,6 +263,7 @@ public class HomeFragment extends Fragment{
         button = view.findViewById(R.id.button);
         button_rename = view.findViewById(R.id.button_rename);
         mEditText = view.findViewById(R.id.editTextText);
+        newAlbumName = view.findViewById(R.id.editTextText2);
 
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -241,7 +343,7 @@ public class HomeFragment extends Fragment{
 
     public ArrayList<String> load(View view) {
         FileInputStream fis = null;
-        FileOutputStream fos = null;
+        //FileOutputStream fos = null;
         ArrayList<String> tempitems = new ArrayList<>();
         //ArrayAdapter<String> tempitemsAdapter;
         ArrayList<Character> charArrayList = new ArrayList<Character>();
@@ -271,7 +373,8 @@ public class HomeFragment extends Fragment{
             for(Character c: charArrayList) {
                 builder.append(c);
             }
-            tempitems.add(builder.toString());
+            if (!builder.toString().equals(""))
+                tempitems.add(builder.toString());
             charArrayList.clear();
 
             fis.close();
