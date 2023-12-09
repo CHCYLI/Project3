@@ -17,5 +17,9 @@ public class Home implements Serializable{
 		username = name;
 		albums = new ArrayList<Album>();
 	}
+
+	public void setHome (ArrayList<Album> albumslist) {
+		albums = albumslist;
+	}
 	
 }

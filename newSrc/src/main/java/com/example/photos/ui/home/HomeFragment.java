@@ -34,8 +34,13 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+import com.example.photos.model.Album;
+import com.example.photos.model.Home;
+
 
 public class HomeFragment extends Fragment{
+    public ArrayList<Album> albumsarraylist = new ArrayList<Album>();
+    public Home defaulthome = new Home("user");
     private ArrayList<String> items;
     private ArrayAdapter<String> itemsAdapter;
     private ListView listView;
@@ -201,6 +206,11 @@ public class HomeFragment extends Fragment{
             itemsAdapter =  new ArrayAdapter<String>(view.getContext(), android.R.layout.simple_list_item_1, items);
             listView.setAdapter(itemsAdapter);
 
+            for (int i = 0; i < items.size(); i++) {
+                albumsarraylist.add(new Album(items.get(i), "user"));
+            }
+            defaulthome.setHome(albumsarraylist);
+
             Toast.makeText(view.getContext(), "Rename successfully!", Toast.LENGTH_LONG).show();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -245,7 +255,6 @@ public class HomeFragment extends Fragment{
         button_rename = view.findViewById(R.id.button_rename);
         mEditText = view.findViewById(R.id.editTextText);
         newAlbumName = view.findViewById(R.id.editTextText2);
-
         temp_toPhotosButton = view.findViewById(R.id.toPhotosButton);
 
 
@@ -388,15 +397,4 @@ public class HomeFragment extends Fragment{
 
         return tempitems;
     }
-
-    /*@Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (position == 0) {
-            Toast.makeText(getActivity(), "example", Toast.LENGTH_SHORT).show();
-        }
-
-        if (position == 1) {
-            Toast.makeText(getActivity(), "testing", Toast.LENGTH_SHORT).show();
-        }
-    }*/
 }
