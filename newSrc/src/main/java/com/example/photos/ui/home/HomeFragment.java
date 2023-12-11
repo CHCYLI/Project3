@@ -52,13 +52,23 @@ public class HomeFragment extends Fragment{
 
     private static final String FILE_NAME = "albumslist.txt";
     private static final String TEMP_NAME = "tempalbums.txt";
-    String albumName;
+    public static String albumName;
     EditText mEditText;
     EditText newAlbumName;
 
 
 
     private void setUpListViewListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Context context = getContext();
+                albumName = items.get(position);
+                NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.action_nav_home_to_nav_photos);
+            }
+        });
+
+
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

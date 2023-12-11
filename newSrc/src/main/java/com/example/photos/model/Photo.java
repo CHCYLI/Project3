@@ -38,7 +38,7 @@ public class Photo implements Serializable{
 	
 	public boolean addPerson(String newPerson) {
 		for (String i:people) {
-			if (i.equals(newPerson)) { //if person with same name is found
+			if (i.equalsIgnoreCase(newPerson)) { //if person with same name is found
 				return false; //do not add newPerson
 			}
 		}
@@ -49,7 +49,7 @@ public class Photo implements Serializable{
 	
 	public boolean delPerson(String personToLookFor) {
 		for (String i:people) {
-			if (i.equals(personToLookFor)) { //if matching name found
+			if (i.equalsIgnoreCase(personToLookFor)) { //if matching name found
 				this.people.remove(i); //remove this person
 				return true;
 			}
@@ -57,7 +57,16 @@ public class Photo implements Serializable{
 		//else if no match
 		return false;
 	}
-	
+
+	public boolean containsPerson(String newPerson) {
+		for (String i:people) {
+			if (i.equalsIgnoreCase(newPerson)) { //if person with same name is found
+				return true; //do not add newPerson
+			}
+		}
+		//else if no such person found
+		return false;
+	}
 	public ArrayList<String> getPeople() {
 		return people;
 	}

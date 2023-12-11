@@ -17,6 +17,7 @@ import com.example.photos.ui.home.HomeFragment;
 import com.example.photos.ui.results.ResultsViewModel;
 
 public class PhotosFragment extends Fragment {
+    public static String albumName = HomeFragment.albumName;
 
     private FragmentPhotosBinding binding;
 

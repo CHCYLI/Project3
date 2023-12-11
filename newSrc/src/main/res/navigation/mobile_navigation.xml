@@ -41,7 +41,11 @@
         android:id="@+id/nav_results"
         android:name="com.example.photos.ui.results.ResultsFragment"
         android:label="@string/menu_results"
-        tools:layout="@layout/fragment_results" />
+        tools:layout="@layout/fragment_results" >
+        <action
+            android:id="@+id/action_nav_results_to_nav_slideshow"
+            app:destination="@id/nav_slideshow" />
+    </fragment>
 
 
 </navigation>
