@@ -12,6 +12,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
@@ -20,9 +21,13 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.photos.R;
 import com.example.photos.databinding.FragmentSearchBinding;
 import com.example.photos.model.Photo;
+import com.example.photos.shared.SharedViewModel;
+import com.example.photos.ui.photos.PhotosFragment;
 import com.example.photos.ui.results.ResultsFragment;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class SearchFragment extends Fragment {
@@ -33,6 +38,14 @@ public class SearchFragment extends Fragment {
             "Alabama", "Alaska", "Arizona", "Arkansas", //US states starting with A
             "Alderney", "Liberty", "Leonida", "San Andreas", "North Yankton" //Fictional states in the GTA series
     };
+
+    private SharedViewModel sharedViewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -87,7 +100,14 @@ public class SearchFragment extends Fragment {
                 String tag2type = tag2typeChoice.getSelectedItem().toString();
                 String conjunction = conjunctionChoice.getSelectedItem().toString();
 
-                performSearch(tag1,tag2,tag1type,tag2type,conjunction);
+                ArrayList<Photo> searchResults = performSearch(tag1,tag2,tag1type,tag2type,conjunction);
+
+                if (searchResults != null) {
+                    SharedViewModel sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+                    sharedViewModel.setSearchResults(searchResults);
+
+                    NavHostFragment.findNavController(SearchFragment.this).navigate(R.id.action_nav_search_to_nav_results);
+                }
             }
         });
 
@@ -103,26 +123,27 @@ public class SearchFragment extends Fragment {
     }
 
     //may change type from void to ArrayList<Photo>
-    public void performSearch(String tag1, String tag2, String tag1type, String tag2type, String conjunction) {
+    public ArrayList<Photo> performSearch(String tag1, String tag2, String tag1type, String tag2type, String conjunction) {
+        ArrayList<Photo> searchArrayList = new ArrayList<Photo>();
         if (tag1.equals("")) { //if tag1 is empty
             Context context = getContext();
             Toast.makeText(context, "Tag 1 Entry cannot be empty", Toast.LENGTH_LONG).show();
-            return;
+            return null;
         }
 
-        /*if (tag2.equals("")) { //if tag2 is empty, then only do search on tag1
-            for (Photo i:allPhotos) {
+        if (tag2.equals("")) { //if tag2 is empty, then only do search on tag1
+            for (Photo i:sharedViewModel.getAllPhotosList()) {
                 if (tag1type.equals("Location") && i.getLocation().equalsIgnoreCase(tag1)) {
-                        //add photo to search results (arraylist?)
+                        searchArrayList.add(i);
                     }
                     else if (tag1type.equals("Person") && i.containsPerson(tag1)) {
-                        //add photo to search results
+                        searchArrayList.add(i);
                     }
             }
-        }//*/
+        }
 
-        /*else { //tag2 is not empty
-            for (Photo i:allPhotos) {
+        else { //tag2 is not empty
+            for (Photo i:sharedViewModel.getAllPhotosList()) {
                 boolean tag1match = false, tag2match = false;
                 if (tag1type.equals("Location") && i.getLocation().equalsIgnoreCase(tag1)) { //tag1 location match
                     tag1match = true;
@@ -145,20 +166,14 @@ public class SearchFragment extends Fragment {
                     }
                 }
                 if (conjunction.equals("And") && (tag1match && tag2match)) {
-                    //add photo
+                    searchArrayList.add(i);
                 }
                 else if (conjunction.equals("Or") && (tag1match || tag2match)) { //"Or"
-                    //add photo
+                    searchArrayList.add(i);
                 }
             }
-        }//*/
+        }
 
-        ResultsFragment newResultsFragment = new ResultsFragment();
-        Bundle args = new Bundle();
-        args.putString("test",tag1);
-        newResultsFragment.setArguments(args);
-
-        // Replace the SearchFragment with the ResultsFragment
-        NavHostFragment.findNavController(SearchFragment.this).navigate(R.id.action_nav_search_to_nav_results);
+        return searchArrayList;
     }
 }

@@ -25,8 +25,8 @@ public class AddAlbum extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_add_album);
-        listView = findViewById(R.id.listView);
-        button = findViewById(R.id.button);
+        listView = findViewById(R.id.homeListView);
+        button = findViewById(R.id.addPhotoButton);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View view) {

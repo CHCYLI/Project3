@@ -8,7 +8,7 @@
     tools:context=".ui.home.HomeFragment">
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/addPhotoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -25,7 +25,7 @@
         android:layout_marginBottom="16dp"
         android:background="?android:attr/listDivider"
         android:backgroundTint="#0A3CF4"
-        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintBottom_toTopOf="@+id/addPhotoButton"
         app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
@@ -41,8 +41,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <TextView
+            android:id="@+id/photosTestText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
         <ListView
-            android:id="@+id/listView"
+            android:id="@+id/homeListView"
             android:layout_width="match_parent"
             android:layout_height="578dp" />
     </LinearLayout>
@@ -55,6 +61,6 @@
         android:layout_marginBottom="16dp"
         android:text="Temp: To Slideshow View"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button" />
+        app:layout_constraintEnd_toStartOf="@+id/addPhotoButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

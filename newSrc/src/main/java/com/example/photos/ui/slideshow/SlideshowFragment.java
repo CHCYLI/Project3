@@ -1,5 +1,6 @@
 package com.example.photos.ui.slideshow;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,19 +9,33 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.photos.R;
 import com.example.photos.databinding.FragmentSlideshowBinding;
+import com.example.photos.shared.SharedViewModel;
 import com.example.photos.ui.results.ResultsViewModel;
 import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SlideshowFragment extends Fragment {
 
     private FragmentSlideshowBinding binding;
+
+    private SharedViewModel sharedViewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -43,11 +58,32 @@ public class SlideshowFragment extends Fragment {
         //@tools:sample/backgrounds/scenic[0]
 
         ImageView displayedImage = (ImageView) root.findViewById(R.id.imageSlideshow);
-        displayedImage.setImageResource(R.drawable.ic_menu_gallery);
+        displayedImage.setImageResource(R.drawable.ic_menu_gallery); //test image; TO BE DELETED
         //displayedImage.setImageURI();
 
+        Button moveButton = (Button) root.findViewById(R.id.moveButton);
+        moveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toPrevPhoto();
+            }
+        });
+
         Button prevButton = (Button) root.findViewById(R.id.prevPhotoButton);
+        prevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toPrevPhoto();
+            }
+        });
+
         Button nextButton = (Button) root.findViewById(R.id.nextPhotoButton);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toNextPhoto();
+            }
+        });
 
         Button addTagButton = (Button) root.findViewById(R.id.addTagButton);
         addTagButton.setOnClickListener(new View.OnClickListener() {
@@ -59,7 +95,19 @@ public class SlideshowFragment extends Fragment {
                 String newTagName = newTagTextInput.getText().toString();
                 String newTagType = newTagTypeSpinner.getSelectedItem().toString();
 
-                addTag(newTagName, newTagType);
+                if (newTagName.equals("")) {
+                    Context context = getContext();
+                    Toast.makeText(context, "Tag entry cannot be empty", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                else {
+                    if (newTagType.equals("Location")) {
+                        //writeNewLocationToFile();
+                    }
+                    else { //Person
+
+                    }
+                }
             }
         });
         //final TextView textView = binding.textSearch;
@@ -74,23 +122,10 @@ public class SlideshowFragment extends Fragment {
     }
 
     public void toNextPhoto() {
-
+        //TODO: Fill in method
     }
 
     public void toPrevPhoto() {
-
-    }
-
-    public void addTag(String name, String type) {
-        if (name.equals("")) {
-            //error
-            return;
-        }
-        if (type.equals("Location")) {
-            //thisPhoto.setLocation(name);
-        }
-        else { //person
-            //thisPhoto.addPerson(name);
-        }
+        //TODO: Fill in method
     }
 }

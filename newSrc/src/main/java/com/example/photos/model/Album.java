@@ -26,8 +26,8 @@ public class Album implements Serializable {
 
 	public boolean addPhoto(Photo newPhoto) {
 		for (Photo i:photosInAlbum) {
-			String iName = i.getName();
-			if (iName.equals(newPhoto.getName())) { //if photo with same name is found
+			String iName = i.getURI();
+			if (iName.equals(newPhoto.getURI())) { //if photo with same name is found
 				return false; //do not add newPhoto
 			}
 		}
@@ -38,7 +38,7 @@ public class Album implements Serializable {
 
 	public boolean delPhoto(String photoName) {
 		for (Photo i:photosInAlbum) {
-			String iName = i.getName();
+			String iName = i.getURI();
 			if (iName.equals(photoName)) { //if matching name found
 				this.photosInAlbum.remove(i); //remove photo
 				return true;
@@ -55,7 +55,7 @@ public class Album implements Serializable {
 
 	public Photo getPhoto(String photoName) {
 		for (Photo i:photosInAlbum) {
-			String iName = i.getName();
+			String iName = i.getURI();
 			if (iName.equals(photoName)) { //if matching name found
 				return i;
 			}
@@ -70,7 +70,7 @@ public class Album implements Serializable {
 
 	public int getPhotoIndex(String name) {
 		for (int i = 0; i < photosInAlbum.size(); i++) {
-			if (photosInAlbum.get(i).getName().equals(name)) return i;
+			if (photosInAlbum.get(i).getURI().equals(name)) return i;
 		}
 		return -1;
 	}
