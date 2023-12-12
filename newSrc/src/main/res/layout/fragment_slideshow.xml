@@ -79,7 +79,7 @@
             android:id="@+id/newTagTextInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Ex: Sesh, Yosemite, etc." />
+            android:hint="Enter albumName or tag..." />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

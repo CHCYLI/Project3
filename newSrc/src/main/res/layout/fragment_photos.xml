@@ -47,20 +47,15 @@
             android:layout_height="wrap_content"
             android:text="TextView" />
 
+        <ImageView
+            android:id="@+id/testImageView"
+            android:layout_width="match_parent"
+            android:layout_height="64dp" />
+
         <ListView
-            android:id="@+id/homeListView"
+            android:id="@+id/photosListView"
             android:layout_width="match_parent"
             android:layout_height="578dp" />
     </LinearLayout>
-
-    <Button
-        android:id="@+id/toSlideshowButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="Temp: To Slideshow View"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/addPhotoButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

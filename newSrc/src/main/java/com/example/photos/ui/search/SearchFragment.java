@@ -41,6 +41,8 @@ public class SearchFragment extends Fragment {
 
     private SharedViewModel sharedViewModel;
 
+    private String[] tagsArr;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +56,11 @@ public class SearchFragment extends Fragment {
 
         binding = FragmentSearchBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        tagsArr = new String[sharedViewModel.getAllTagsList().size()];
+        for (int i = 0; i < sharedViewModel.getAllTagsList().size(); i++) {
+            tagsArr[i] = sharedViewModel.getAllTagsList().get(i).first;
+        }
 
         //SPINNER SETUP
         Spinner typeSpinner1 = (Spinner) root.findViewById(R.id.typeSpinner1);
@@ -82,7 +89,7 @@ public class SearchFragment extends Fragment {
         //TEXT INPUT SETUP
         AutoCompleteTextView tag1input = (AutoCompleteTextView) root.findViewById(R.id.tagInputEntry1);
         AutoCompleteTextView tag2input = (AutoCompleteTextView) root.findViewById(R.id.tagInputEntry2);
-        ArrayAdapter<String> autoInputAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, autoCompleteTestArr);
+        ArrayAdapter<String> autoInputAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, tagsArr);
         tag1input.setAdapter(autoInputAdapter); tag2input.setAdapter(autoInputAdapter);
 
         //SEARCH BUTTON SETUP
@@ -125,6 +132,7 @@ public class SearchFragment extends Fragment {
     //may change type from void to ArrayList<Photo>
     public ArrayList<Photo> performSearch(String tag1, String tag2, String tag1type, String tag2type, String conjunction) {
         ArrayList<Photo> searchArrayList = new ArrayList<Photo>();
+        ArrayList<Photo> temp = sharedViewModel.getAllPhotosList();
         if (tag1.equals("")) { //if tag1 is empty
             Context context = getContext();
             Toast.makeText(context, "Tag 1 Entry cannot be empty", Toast.LENGTH_LONG).show();
@@ -132,44 +140,60 @@ public class SearchFragment extends Fragment {
         }
 
         if (tag2.equals("")) { //if tag2 is empty, then only do search on tag1
-            for (Photo i:sharedViewModel.getAllPhotosList()) {
+            for (Photo i:temp) {
                 if (tag1type.equals("Location") && i.getLocation().equalsIgnoreCase(tag1)) {
                         searchArrayList.add(i);
                     }
-                    else if (tag1type.equals("Person") && i.containsPerson(tag1)) {
-                        searchArrayList.add(i);
+                else if (tag1type.equals("Person")) {
+                    for (String j:i.getPeople()) {
+                        if (j.equalsIgnoreCase(tag1)) {
+                            searchArrayList.add(i);
+                        }
                     }
+                }
             }
         }
 
         else { //tag2 is not empty
-            for (Photo i:sharedViewModel.getAllPhotosList()) {
+            for (Photo i:temp) {
                 boolean tag1match = false, tag2match = false;
                 if (tag1type.equals("Location") && i.getLocation().equalsIgnoreCase(tag1)) { //tag1 location match
                     tag1match = true;
                     if (tag2type.equals("Location") && i.getLocation().equalsIgnoreCase(tag2)) {
                         tag2match = true;
                     }
-                    else if (tag2type.equals("Person") && i.containsPerson(tag2)) {
-                        tag2match = true;
-                    }
-                }
-                else if (tag1type.equals("Person") && i.containsPerson(tag1)) { //tag1 person match
-                    if (i.containsPerson(tag1)) {
-                        tag1match = true;
-                        if (tag2type.equals("Location") && i.getLocation().equalsIgnoreCase(tag2)) {
-                            tag2match = true;
-                        }
-                        else if (tag2type.equals("Person") && i.containsPerson(tag2)) {
-                            tag2match = true;
+                    else if (tag2type.equals("Person")) {
+                        for (String j:i.getPeople()) {
+                            if (j.equalsIgnoreCase(tag1)) {
+                                tag2match = true;
+                            }
                         }
                     }
                 }
-                if (conjunction.equals("And") && (tag1match && tag2match)) {
-                    searchArrayList.add(i);
+                else if (tag1type.equals("Person")) { //tag1 person match
+                    for (String j:i.getPeople()) {
+                        if (j.equalsIgnoreCase(tag1)) {
+                            tag1match = true;
+                            if (tag2type.equals("Location") && i.getLocation().equalsIgnoreCase(tag2)) {
+                                tag2match = true;
+                            }
+                            else if (tag2type.equals("Person")) {
+                                for (String k:i.getPeople()) {
+                                    if (k.equalsIgnoreCase(tag1)) {
+                                        tag2match = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-                else if (conjunction.equals("Or") && (tag1match || tag2match)) { //"Or"
-                    searchArrayList.add(i);
+                if (tag1match || tag2match) {
+                    if (conjunction.equals("Or")) {
+                        searchArrayList.add(i);
+                    }
+                    else if (tag1match && tag2match) { //And
+                        searchArrayList.add(i);
+                    }
                 }
             }
         }

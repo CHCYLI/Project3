@@ -60,8 +60,9 @@ public class ResultsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Context context = getContext();
-                String albumName = searchResultsURIs.get(position);
-                sharedViewModel.setSelectedAlbumName(albumName);
+
+                String imageURI = searchResultsURIs.get(position);
+                sharedViewModel.setCurrPhotoURI(imageURI);
 
                 NavHostFragment.findNavController(ResultsFragment.this).navigate(R.id.action_nav_results_to_nav_slideshow);
             }

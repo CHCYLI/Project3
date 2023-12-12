@@ -1,7 +1,11 @@
 package com.example.photos.ui.slideshow;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,16 +22,23 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.photos.R;
 import com.example.photos.databinding.FragmentSlideshowBinding;
+import com.example.photos.model.Photo;
 import com.example.photos.shared.SharedViewModel;
 import com.example.photos.ui.results.ResultsViewModel;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SlideshowFragment extends Fragment {
 
     private FragmentSlideshowBinding binding;
+
+    private ArrayList<Photo> photosInAlbum;
+    private String currPhotoURI;
 
     private SharedViewModel sharedViewModel;
 
@@ -45,6 +56,9 @@ public class SlideshowFragment extends Fragment {
         binding = FragmentSlideshowBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        photosInAlbum = sharedViewModel.getPhotosInAlbum();
+        currPhotoURI = sharedViewModel.getCurrPhotoURI();
+
         Spinner newTypeSpinner = (Spinner) root.findViewById(R.id.newTagSpinner);
         // Create an ArrayAdapter using the string array and a default spinner layout.
         ArrayAdapter<CharSequence> newTypeAdapter = ArrayAdapter.createFromResource(
@@ -58,14 +72,25 @@ public class SlideshowFragment extends Fragment {
         //@tools:sample/backgrounds/scenic[0]
 
         ImageView displayedImage = (ImageView) root.findViewById(R.id.imageSlideshow);
-        displayedImage.setImageResource(R.drawable.ic_menu_gallery); //test image; TO BE DELETED
-        //displayedImage.setImageURI();
+        displayedImage.setImageResource(R.drawable.ic_menu_gallery); //test image, to be replaced
+        try {
+            InputStream inputStream = getActivity().getContentResolver().openInputStream(Uri.parse(currPhotoURI));
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            displayedImage.setImageBitmap(bitmap);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            // Handle the error
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            // Handle the security exception
+        }
 
         Button moveButton = (Button) root.findViewById(R.id.moveButton);
         moveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                toPrevPhoto();
+                String newAlbumName = ((TextInputEditText) root.findViewById(R.id.newTagTextInput)).getText().toString();
+                move(newAlbumName);
             }
         });
 
@@ -74,6 +99,17 @@ public class SlideshowFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 toPrevPhoto();
+                try {
+                    InputStream inputStream = getActivity().getContentResolver().openInputStream(Uri.parse(currPhotoURI));
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    displayedImage.setImageBitmap(bitmap);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    // Handle the error
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                    // Handle the security exception
+                }
             }
         });
 
@@ -82,6 +118,17 @@ public class SlideshowFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 toNextPhoto();
+                try {
+                    InputStream inputStream = getActivity().getContentResolver().openInputStream(Uri.parse(currPhotoURI));
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    displayedImage.setImageBitmap(bitmap);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    // Handle the error
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                    // Handle the security exception
+                }
             }
         });
 
@@ -95,23 +142,10 @@ public class SlideshowFragment extends Fragment {
                 String newTagName = newTagTextInput.getText().toString();
                 String newTagType = newTagTypeSpinner.getSelectedItem().toString();
 
-                if (newTagName.equals("")) {
-                    Context context = getContext();
-                    Toast.makeText(context, "Tag entry cannot be empty", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                else {
-                    if (newTagType.equals("Location")) {
-                        //writeNewLocationToFile();
-                    }
-                    else { //Person
-
-                    }
-                }
+                if (newTagType.equals("Location")) addLocation(newTagName);
+                else addPerson(newTagName); //Person
             }
         });
-        //final TextView textView = binding.textSearch;
-        //searchViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
@@ -121,11 +155,106 @@ public class SlideshowFragment extends Fragment {
         binding = null;
     }
 
-    public void toNextPhoto() {
-        //TODO: Fill in method
+    public void toNextPhoto() { //updates currPhotoURI
+        int currIndex = -1;
+        for (int i = 0; i < photosInAlbum.size(); i++) {
+            if (photosInAlbum.get(i).getURI().equals(currPhotoURI)) {
+                currIndex = i;
+                break;
+            }
+        }
+        if (currIndex == -1 || currIndex >= photosInAlbum.size()-1) {
+            Toast.makeText(this.getContext(), "Last item in album", Toast.LENGTH_LONG).show();
+            return;
+        }
+        currIndex++;
+        currPhotoURI = photosInAlbum.get(currIndex).getURI();
     }
 
     public void toPrevPhoto() {
-        //TODO: Fill in method
+        int currIndex = -1;
+        for (int i = 0; i < photosInAlbum.size(); i++) {
+            if (photosInAlbum.get(i).getURI().equals(currPhotoURI)) {
+                currIndex = i;
+                break;
+            }
+        }
+        if (currIndex <= 0) {
+            Toast.makeText(this.getContext(), "First item in album", Toast.LENGTH_LONG).show();
+            return;
+        }
+        currIndex--;
+        currPhotoURI = photosInAlbum.get(currIndex).getURI();
+    }
+
+    public void move(String newAlbumName) {
+        if (newAlbumName.equals("")) {
+            Toast.makeText(this.getContext(), "Album name cannot be empty", Toast.LENGTH_LONG).show();
+            return;
+        }
+        ArrayList<Photo> temp = sharedViewModel.getAllPhotosList();
+        for (Photo i:temp) {
+            if (i.getNameOfContainingAlbum().equals(newAlbumName) && i.getURI().equals(currPhotoURI)) { //repeat found
+                Toast.makeText(this.getContext(), "Photo of same URI exists in destination", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+        //loop ends, if no repeat is found
+        ArrayList<Photo> tempAllPhotosList = sharedViewModel.getAllPhotosList();
+        for (Photo i:tempAllPhotosList) {
+            if (i.getURI().equals(currPhotoURI)) {
+                i.setNameOfContainingAlbum(newAlbumName);
+                break;
+            }
+        }
+        sharedViewModel.setAllPhotosList(tempAllPhotosList);
+        Context context = getContext();
+        Toast.makeText(context, "Photo moved", Toast.LENGTH_LONG).show();
+        //TODO: write to file
+    }
+
+    public void addLocation(String newLocation) {
+        if (newLocation.equals("")) {
+            Context context = getContext();
+            Toast.makeText(context, "Tag entry cannot be empty", Toast.LENGTH_LONG).show();
+            return;
+        }
+        ArrayList<Photo> tempAllPhotosList = sharedViewModel.getAllPhotosList();
+        for (Photo i:tempAllPhotosList) {
+            if (i.getURI().equals(currPhotoURI)) {
+                i.setLocation(newLocation);
+                break;
+            }
+        }
+        ArrayList<Pair<String,String>> tempALlTagsList = sharedViewModel.getAllTagsList();
+        tempALlTagsList.add(new Pair<>(newLocation, "Location"));
+        sharedViewModel.setAllTagsList(tempALlTagsList);
+        sharedViewModel.setAllPhotosList(tempAllPhotosList);
+        Context context = getContext();
+        Toast.makeText(context, "Added tag", Toast.LENGTH_LONG).show();
+        //TODO:write to file
+    }
+
+    public void addPerson(String newPerson) {
+        if (newPerson.equals("")) {
+            Context context = getContext();
+            Toast.makeText(context, "Tag entry cannot be empty", Toast.LENGTH_LONG).show();
+            return;
+        }
+        ArrayList<Photo> tempAllPhotosList = sharedViewModel.getAllPhotosList();
+        for (Photo i:tempAllPhotosList) {
+            if (i.getURI().equals(currPhotoURI)) {
+                i.addPerson(newPerson);
+                break;
+            }
+        }
+
+        ArrayList<Pair<String,String>> tempALlTagsList = sharedViewModel.getAllTagsList();
+        tempALlTagsList.add(new Pair<>(newPerson, "Person"));
+        sharedViewModel.setAllTagsList(tempALlTagsList);
+        sharedViewModel.setAllPhotosList(tempAllPhotosList);
+        Context context = getContext();
+        Toast.makeText(context, "Added tag", Toast.LENGTH_LONG).show();
+        //TODO:write to file
     }
 }

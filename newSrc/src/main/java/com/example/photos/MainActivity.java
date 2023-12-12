@@ -1,14 +1,20 @@
 package com.example.photos;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
 
+import com.example.photos.model.Photo;
 import com.example.photos.shared.SharedViewModel;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -19,8 +25,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.photos.databinding.ActivityMainBinding;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
 
+public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
     private SharedViewModel sharedViewModel;
@@ -33,16 +40,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
-        //sharedViewModel.loadData();
+
+        /*Testing
+        String uri1 = "content://media/picker/0/com.android.providers.media.photopicker/media/1000000034";
+        String uri2 = "content://media/picker/0/com.android.providers.media.photopicker/media/1000000035";
+        Photo photo1 = new Photo(uri1,"abc1");
+        Photo photo2 = new Photo(uri2,"def2");
+        ArrayList<Photo> test = new ArrayList<Photo>();
+        test.add(photo1); test.add(photo2);
+        sharedViewModel.setAllPhotosList(test);
+        */
 
         setSupportActionBar(binding.appBarMain.toolbar);
-        /*binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
